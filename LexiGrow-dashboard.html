@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>LexiGrow</title>
+
+<style>
+:root{
+  --bg: #fafaf5;
+  --white: #ffffff;
+  --green-700: #275a2a;
+  --green-500: #3e8f44;
+  --green-light: #e9f7eb;
+  --muted: #7f8b7b;
+  --border: #e6e9e0;
+  font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+body{height:100vh;background:var(--bg);overflow:hidden;color:var(--green-700)}
+
+.app{display:flex;height:100vh;}
+
+/* SIDEBAR */
+.sidebar{
+  width:180px;
+  background:#f3f3ea;
+  border-right:1px solid var(--border);
+  padding:22px 14px;
+  display:flex;flex-direction:column;justify-content:space-between;
+}
+.brand{font-weight:700;font-size:20px;display:flex;gap:8px}
+.menu{margin-top:18px;display:flex;flex-direction:column;gap:12px}
+.menu a{padding:8px 12px;border-radius:14px;color:var(--green-700);display:flex;gap:10px}
+.menu a.active{background:var(--green-light)}
+.sidebar-bottom{display:flex;flex-direction:column;gap:8px}
+
+/* NAVBAR */
+.navbar{
+  position:fixed;
+  left:180px;
+  right:0;
+  top:0;
+  height:68px;
+  background:var(--white);
+  border-bottom:1px solid var(--border);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:10px 30px;
+  z-index:10;
+}
+.searchbar{
+  background:#f4f4ef;
+  border-radius:30px;
+  padding:10px 16px;
+  width:420px;
+}
+.searchbar input{
+  border:0;outline:0;background:transparent;width:100%;
+}
+
+/* MAIN FIX — LEFT ALIGNMENT */
+.main{
+  position:relative;
+  margin-left: 0;
+padding-left: 180px;   /* pushes content exactly under sidebar, no gap */
+  margin-top:68px;
+
+  
+  width:100%;
+  max-width:100%;  /* ← FIXED! */
+
+  padding:6px 20px 34px 20px;
+  height:calc(100vh - 68px);
+  overflow-y:auto;
+}
+
+/* WELCOME */
+.welcome{
+  background:var(--green-light);
+  border-radius:18px;
+  padding:22px 30px;
+  border:1px solid var(--border);
+  margin-bottom:6px;
+}
+.welcome h2{
+  margin-top:0!important;
+  font-size:30px;
+  font-weight:700;
+  margin-bottom:6px;
+}
+.welcome p{color:var(--muted);margin-bottom:12px}
+.btn{
+  background:var(--green-500);
+  color:#fff;
+  padding:10px 18px;
+  border:none;
+  border-radius:24px;
+}
+
+/* QUICK ACTIONS */
+.quick-actions{
+  margin-top:0!important;margin-bottom:6px;
+}
+.quick-actions h3{
+  font-size:18px;margin-bottom:10px;
+}
+.cards{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:14px;
+}
+.card{
+  background:var(--white);
+  border:1px solid var(--border);
+  padding:18px;
+  border-radius:12px;
+  text-align:center;
+  font-size:14px;
+  box-shadow:0 1px 4px rgba(20,30,20,0.05);
+}
+.card small{
+  display:block;font-size:13px;color:var(--muted);margin-top:6px;
+}
+
+/* SNAPSHOT */
+.snapshot h3{font-size:18px;margin-bottom:10px}
+
+.snapshot-outer{
+  background: linear-gradient(180deg, rgba(233,243,235,0.95), #ffffff);
+  padding:18px;
+  border-radius:20px;
+  border:1px solid rgba(210,220,210,0.6);
+  position:relative;
+}
+.snapshot-inner{
+  background:#f8fbf7;
+  border-radius:14px;
+  padding:16px;
+  display:flex;
+  gap:26px;
+  border:1px solid var(--border);
+}
+.snapshot-plant{
+  position:absolute;top:10px;right:16px;width:88px;height:88px;
+}
+
+/* LEFT SNAPSHOT */
+.left{width:200px;display:flex;gap:12px}
+.left .badge{
+  width:50px;height:50px;border-radius:12px;background:#fff;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 2px 8px rgba(0,0,0,0.04)
+}
+.left .title{font-weight:700;font-size:18px;margin-bottom:4px}
+.left .muted{font-size:14px;color:var(--muted)}
+
+/* CENTER */
+.center{
+  flex:1;
+  padding:0 12px;
+  border-left:1px solid #d6e0d6;
+  border-right:1px solid #d6e0d6;
+}
+.center h4{font-size:16px;font-weight:700;margin-bottom:4px}
+.center .stat{font-size:14px;font-weight:600}
+
+/* RIGHT */
+.right{width:270px}
+.right h4{font-size:16px;font-weight:700;margin-bottom:4px}
+.right .muted{font-size:14px;color:var(--muted);line-height:1.35}
+
+/* FOOTER */
+.snapshot-footer{
+  margin-top:10px;padding-top:8px;
+  border-top:1px solid #d6e0d6;
+  display:flex;gap:12px;font-size:13px;color:var(--muted)
+}
+
+/* DIAGNOSIS */
+.diagnosis{margin-top:14px}
+.diagnosis h3{font-size:18px;margin-bottom:10px}
+.upload-box,.result-box{
+  background:var(--white);
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:18px;
+}
+.preview{
+  margin-top:10px;height:220px;border-radius:12px;
+  border:1px dashed var(--border);
+  display:flex;justify-content:center;align-items:center;
+  color:var(--muted);
+}
+.diag-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:22px;
+}
+
+/*extra UI improvement*/
+
+.result-card{
+  margin-top:8px;
+  line-height:1.6;
+}
+
+.status-badge{
+  display:inline-block;
+  padding:4px 12px;
+  border-radius:16px;
+  font-size:13px;
+  font-weight:600;
+}
+
+.status-healthy{
+  background:#e6f6e8;
+  color:#2e7d32;
+}
+
+.status-diseased{
+  background:#fdeaea;
+  color:#c62828;
+}
+
+.confidence-bar{
+  width:100%;
+  height:10px;
+  background:#eef1ea;
+  border-radius:10px;
+  margin-top:6px;
+  overflow:hidden;
+}
+
+.confidence-fill{
+  height:100%;
+  background:#3e8f44;
+  border-radius:10px;
+}
+
+/* REMINDER MODAL */
+
+.reminder-modal{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.4);
+display:none;
+justify-content:center;
+align-items:center;
+z-index:1000;
+}
+
+.reminder-box{
+background:#fff;
+padding:24px;
+border-radius:12px;
+width:320px;
+display:flex;
+flex-direction:column;
+gap:10px;
+}
+
+.reminder-box input,
+.reminder-box select{
+padding:8px;
+border:1px solid #ddd;
+border-radius:6px;
+}
+
+.reminder-buttons{
+display:flex;
+justify-content:space-between;
+margin-top:10px;
+}
+</style>
+</head>
+
+<body>
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div>
+      <div class="brand">🌱 LexiGrow</div>
+      <nav class="menu">
+        <a class="active">🏠 Dashboard</a>
+        <a>🌿 My Garden</a>
+        <a>🧪 Virtual Lab</a>
+        <a onclick="goToDiagnosis()">🔍 Diagnosis</a>
+        <a>⏰ Care Schedule</a>
+        <a>📚 Plant Library</a>
+      </nav>
+    </div>
+    <div class="sidebar-bottom">
+      <a>🤖 AI Assistant</a>
+      <a>⚙️ Settings</a>
+    </div>
+  </aside>
+
+  <!-- NAVBAR -->
+  <header class="navbar">
+    <div class="searchbar"><input placeholder="Search plants & advice..."></div>
+    <div style="display:flex;gap:14px;align-items:center">
+      <div>☀️ Sunny · 24°C</div>
+      <div style="width:38px;height:38px;border-radius:50%;background:#999"></div>
+    </div>
+  </header>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <section class="welcome">
+      <h2>Welcome to Your Urban Oasis</h2>
+      <p>Let’s grow together. Get personalized crop advice to start your journey.</p>
+      <button class="btn">Get Personalized Advice →</button>
+    </section>
+
+    <section class="quick-actions">
+      <h3>Quick Actions</h3>
+      <div class="cards">
+       	<div class="card" onclick="scrollToDiagnosis()">🖼 Scan a Plant <small>Identify issues</small></div>
+        <div class="card" onclick="getCropAdvice()">📡 Get Crop Advice<small>Ask your Assistant</small></div>
+        <div class="card">🧪 Virtual Lab <small>Simulate growth</small></div>
+        <div class="card" onclick="openReminder()">⏰ Set Reminder <small>Stay on track</small></div>
+        <div class="card">🧩 Space Organization <small>Optimize your space</small></div>
+      </div>
+    </section>
+
+    <section class="snapshot">
+      <h3>Today's Garden Snapshot</h3>
+
+      <div class="snapshot-outer">
+
+        <div class="snapshot-plant">
+          <svg viewBox="0 0 120 120">
+            <rect x="28" y="64" width="64" height="20" rx="6" fill="#d9a079"/>
+            <rect x="34" y="58" width="52" height="8" rx="4" fill="#f0c7a2"/>
+            <path d="M60 54c6-18 30-20 20-2-10 18-28 10-20 2z" fill="#9ed7a5"/>
+            <path d="M60 54c-6-18-30-20-20-2 10 18 28 10 20 2z" fill="#9ed7a5"/>
+            <circle cx="64" cy="48" r="3" fill="#6aa06a"/>
+          </svg>
+        </div>
+
+        <div class="snapshot-inner">
+
+          <div class="left">
+            <div class="badge">
+              <svg width="30" height="30" viewBox="0 0 24 24">
+                <path fill="#2ea6f1" d="M12 2S7 7 7 11a5 5 0 0010 0c0-4-5-9-5-9z"/>
+              </svg>
+            </div>
+            <div>
+              <div class="title">Good (58%)</div>
+              <div class="muted">Last checked: 2h</div>
+            </div>
+          </div>
+
+          <div class="center">
+            <h4>Growth Stage</h4>
+            <div class="stat">Seedlings: <strong>4</strong></div>
+            <div class="stat">Vegetative: <strong>7</strong></div>
+            <div class="stat">Flowering: <strong>2</strong></div>
+          </div>
+
+          <div class="right">
+            <h4>AI Tip of the Day</h4>
+            <div class="muted">Low humidity today. Water plants <br> in the morning for best absorption.</div>
+          </div>
+
+        </div>
+
+        <div class="snapshot-footer">
+          <div>💡 Latest decided: 2</div>
+          <div style="margin-left:auto;">Updated 2h ago</div>
+        </div>
+
+      </div>
+    </section>
+
+   <section class="diagnosis" id="diagnosisSection">
+      <h3>Plant Diagnosis</h3>
+      <div class="diag-grid">
+        <div class="upload-box">
+          <label>Upload Image</label>
+          <input type="file" id="imageUpload" accept="image/*">
+          <div class="preview" id="previewBox">No image uploaded</div>
+          <button class="btn" id="predictBtn" style="margin-top:10px">Predict</button>
+        </div>
+        <div class="result-box" id="resultBox">
+          Upload an image to start diagnosis.
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+
+
+const previewBox = document.getElementById("previewBox");
+const upload = document.getElementById("imageUpload");
+const resultBox = document.getElementById("resultBox");
+const predictBtn = document.getElementById("predictBtn");
+
+
+// IMAGE PREVIEW
+upload.addEventListener("change", function(){
+
+    const file = upload.files[0];
+
+    if(!file) return;
+
+    const reader = new FileReader();
+
+    reader.onload = function(e){
+        previewBox.innerHTML =
+        `<img src="${e.target.result}" style="max-width:100%;border-radius:12px;">`;
+    };
+
+    reader.readAsDataURL(file);
+
+});
+
+
+// PREDICT BUTTON
+predictBtn.addEventListener("click", async function(){
+
+    const file = upload.files[0];
+
+    if(!file){
+        alert("Please upload an image first.");
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    resultBox.innerHTML = "Analyzing plant image... 🌱";
+
+    try{
+
+        const response = await fetch("http://127.0.0.1:8000/predict",{
+            method:"POST",
+            body:formData
+        });
+
+        const data = await response.json();
+	
+	const adviceResponse = await fetch("http://127.0.0.1:8000/crop_advice",{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body: JSON.stringify({
+disease: data.disease
+})
+});
+
+const adviceData = await adviceResponse.json();
+	
+	
+
+        const statusClass =
+            data.status === "Healthy"
+            ? "status-healthy"
+            : "status-diseased";
+
+        resultBox.innerHTML = `
+
+        <div class="result-card">
+
+        <h3>Diagnosis Result</h3>
+
+        <p><b>Plant:</b> ${data.plant}</p>
+
+        <p><b>Disease:</b> ${data.disease}</p>
+
+        <p>
+        <b>Status:</b>
+        <span class="status-badge ${statusClass}">
+        ${data.status}
+        </span>
+        </p>
+
+        <p><b>Confidence:</b> ${data.confidence}%</p>
+
+        <div class="confidence-bar">
+            <div class="confidence-fill"
+            style="width:${data.confidence}%">
+            </div>
+        </div>
+
+        <p style="margin-top:10px">
+<b>Recommendation:</b><br>
+${data.recommendation}
+</p>
+
+<p style="margin-top:10px">
+<b>AI Crop Advice:</b><br>
+${adviceData.advice}
+</p>
+
+        </div>
+
+        `;
+
+    }
+    catch(error){
+
+        console.error(error);
+
+        resultBox.innerHTML =
+        "Prediction failed. Make sure backend server is running.";
+
+    }
+
+});
+
+// OPEN REMINDER MODAL
+function openReminder(){
+document.getElementById("reminderModal").style.display="flex";
+}
+
+// CLOSE MODAL
+function closeReminder(){
+document.getElementById("reminderModal").style.display="none";
+}
+
+
+// SAVE REMINDER + NOTIFICATION
+function saveReminder(){
+
+const plant = document.getElementById("plantName").value;
+const task = document.getElementById("taskType").value;
+const time = document.getElementById("reminderTime").value;
+
+if(!plant || !time){
+alert("Please fill all fields");
+return;
+}
+
+const reminderTime = new Date(time).getTime();
+const now = new Date().getTime();
+
+const delay = reminderTime - now;
+
+if(delay <= 0){
+alert("Please choose a future time.");
+return;
+}
+
+
+// REQUEST NOTIFICATION PERMISSION
+Notification.requestPermission().then(permission=>{
+
+if(permission === "granted"){
+
+setTimeout(()=>{
+
+new Notification("🌱 LexiGrow Reminder",{
+body:`${task} for ${plant}`
+});
+
+}, delay);
+
+alert("Reminder set successfully!");
+
+closeReminder();
+
+}
+
+});
+
+}
+async function getCropAdvice(){
+
+resultBox.innerHTML = "Getting AI advice... 🤖";
+
+const response = await fetch("http://127.0.0.1:8000/crop_advice",{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body: JSON.stringify({
+disease:"Bell_Pepper_Bacterial_spot"
+})
+});
+
+const data = await response.json();
+
+resultBox.innerHTML = data.advice;
+
+}
+
+function goToDiagnosis(){
+
+document
+.getElementById("diagnosisSection")
+.scrollIntoView({ behavior: "smooth" });
+
+setTimeout(()=>{
+document.getElementById("imageUpload").click();
+},600);
+
+}
+</script>
+
+
+<!-- REMINDER MODAL -->
+<div id="reminderModal" class="reminder-modal">
+
+<div class="reminder-box">
+
+<h3>Set Plant Reminder</h3>
+
+<label>Plant Name</label>
+<input type="text" id="plantName" placeholder="e.g. Strawberry">
+
+<label>Task</label>
+<select id="taskType">
+<option>Water Plant</option>
+<option>Fertilize Plant</option>
+<option>Check Plant Health</option>
+</select>
+
+<label>Date & Time</label>
+<input type="datetime-local" id="reminderTime">
+
+<div class="reminder-buttons">
+<button onclick="saveReminder()" class="btn">Save Reminder</button>
+<button onclick="closeReminder()">Cancel</button>
+</div>
+
+</div>
+</div>
+</body>
+</html>

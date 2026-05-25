@@ -1,0 +1,68 @@
+//1st (importing google drive to google colab)
+from google.colab import drive
+drive.mount('/content/drive')
+
+
+//2nd (checking the content of drive)
+ls /content/drive/MyDrive
+
+
+//3rd (to load the model from drive)
+import tensorflow as tf
+
+model = tf.keras.models.load_model(
+    "/content/drive/MyDrive/lexigrow_cnn_model.h5"
+)
+
+print("✅ LexiGrow CNN model loaded successfully")
+
+//4th 
+model = tf.keras.models.load_model(
+    "/content/drive/MyDrive/lexigrow_model.keras"
+)
+
+//5th(to test the model)
+
+from google.colab import files
+from tensorflow.keras.preprocessing import image
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Define class names FIRST
+CLASS_NAMES = [
+    "Bell_Pepper_Bacterial_spot",
+    "Bell_Pepper_healthy",
+    "Strawberry_Leaf_Scorch",
+    "Strawberry_healthy"
+]
+
+# Upload image
+uploaded = files.upload()
+
+# Get uploaded file name
+img_name = list(uploaded.keys())[0]
+
+# Load and preprocess image
+img = image.load_img(img_name, target_size=(224, 224))
+img_array = image.img_to_array(img) / 255.0
+img_array = np.expand_dims(img_array, axis=0)
+
+# Predict
+prediction = model.predict(img_array)
+class_idx = np.argmax(prediction)
+confidence = np.max(prediction)
+
+# Confidence threshold logic
+if confidence < 0.70:
+    result = "Unsupported plant or disease"
+else:
+    result = CLASS_NAMES[class_idx]
+
+# Output
+print("Prediction:", result)
+print("Confidence:", round(confidence * 100, 2), "%")
+
+# Show image
+plt.imshow(img)
+plt.axis('off')
+plt.show()

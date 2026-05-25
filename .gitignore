@@ -1,0 +1,12 @@
+.vscode/
+__pycache__/
+*.pyc
+venv/
+.env
+desktop.ini
+zipFile/
+*.docx
+*.pptx
+FinalSynopsis.pdf
+Group-10Progress_Report(LEXIGROW).pdf
+weekly_progress _project.pdf
